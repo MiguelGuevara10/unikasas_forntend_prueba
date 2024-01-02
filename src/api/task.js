@@ -13,4 +13,4 @@ export const updateTaskRequest = (id, task) => axios.put(`/tasks/${id}`, task)
 
 export const deleteTaskRequest = (id) => axios.delete(`/tasks/${id}`)
 
-export const reportTaskRequest = (data) => axios.post('/reports', data, { responseType: 'blob' })
+export const reportTaskRequest = (data) => axios.post('/reports-tasks', data, { responseType: 'blob' })

@@ -9,7 +9,8 @@
 :root {
   --orange: #ffa500;
   --red: #EA411D;
-  --green:#006400;
+  /* --green:#006400; */
+  --green:#42ab50;
 }
 
 .orange {
@@ -24,3 +25,6 @@
   background-color: var(--green);
 }
 
+body{
+  background-color: white;
+}

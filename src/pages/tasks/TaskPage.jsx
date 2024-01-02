@@ -1,10 +1,13 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useTask } from "../../context/TaskContext"
-import TaskCard from "../../components/TaskCard"
+import TaskCard from "../../components/cards/TaskCard"
 import { Link } from "react-router-dom"
 import { useForm } from "react-hook-form"
 import Alert from "../../components/Alert"
-import { IconCreate, IconReport, IconSearch } from "../../icons/iconsConstants"
+import { IconCreate, IconReport } from "../../icons/iconsConstants"
+import Pagination from "../../components/Pagination"
+import SearchBar from "../../components/SearchBar"
+import ReportModal from "../../components/modals/ReportModal"
 
 function TaskPage() {
   // Funciones y variables a usar en la pagina
@@ -16,59 +19,84 @@ function TaskPage() {
     getTasks()
   }, [])
 
+  // Paginar tareas 
+  const [currentPage, setCurrentPage] = useState(1)
+  const perPage = 9 // Número de tareas por página
+
+  // Calcular el índice inicial y final para mostrar los tareas en la página actual
+  const startIndex = (currentPage - 1) * perPage;
+  const endIndex = currentPage * perPage;
+
+  const totalPages = Math.ceil(tasks.length / perPage) // Calcular el número total de páginas
+
+  // Obtener los tareas para la página actual
+  let tasksPerPage = tasks.slice(startIndex, endIndex)
+
+  // Cambiar a la página anterior
+  const goToPrevPage = () => {
+    setCurrentPage((prevPage) => prevPage - 1);
+  }
+
+  // Cambiar a la página siguiente
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((prevPage) => prevPage + 1)
+    }
+  }
+
   // Filtro de busqueda de tareas
   const onSubmit = handleSubmit(async (query)=> {
     getTasksFilter(query)  
+    tasksPerPage = tasks // Cambiar a las tareas filtradas
     reset()
   })
 
+  // Esta función se ejecutará cuando currentPage cambie para volver al inicio de la pagina
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentPage])
+
+    // Modal de reportes
+    const [open, setOpen] = useState(false)
+
+    // Abrir y cerrar modal
+    const handleClick = () => {
+      setOpen(!open);
+    }
+
   return (
-    <div className="px-4 py-4 sm:px-6 lg:col-span-3 lg:px-8">
-      <div className="mx-auto max-w-lg text-center mb-3">
-          <h2 className="text-3xl font-bold sm:text-2xl mb-2">Buscar Tareas</h2>
+    <main className="px-4 py-4 sm:px-6 lg:col-span-3 lg:px-8">
 
-          <form onSubmit={onSubmit}>
-            <div className="flex justify-center">
-              <input 
-                  type="text" 
-                  placeholder="Buscar tareas por titulo o descripcion..." 
-                  {...register('query')}
-                  className="w-full rounded-md px-4 py-2 border border-black-500 shadow-sm focus:outline-none focus:ring-1 focus:ring-black"
-                  />
-              <button 
-                  type="submit" 
-                  className="flex flex-row items-center ml-2 rounded-md text-white px-4 py-2 orange font-bold hover:text-gray-700 space-x-1" 
-                  >Buscar
-                  <IconSearch />
-              </button>
-            </div>
-          </form>
-
-        </div>
+      <SearchBar /* Barra de busqueda */
+        module_title={"Modulo de tareas"} 
+        onSubmit={onSubmit} 
+        register={register} 
+        text={"Buscar tareas por titulo o descripcion..."} 
+      />
 
       { tasks.length === 0 && <Alert message={"No hay tareas"} color={"bg-green-500"}/> }
       
-      <div className="grid sm:grid-cols-2 md:grid-cols-5 gap-2 text-center mb-2">
-        <button className="orange flex flex-row items-center justify-center text-white text-lg px-2 py-1 rounded-md mb-2 font-bold hover:text-gray-700 space-x-1">
-            <Link to="/add-task">Agregar</Link>
+      <div className="grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 text-center mb-2">
+        <Link to={"/add-task"} className="orange flex flex-row items-center justify-center text-white text-lg px-2 py-1 rounded-md mb-2 font-bold hover:text-gray-700 space-x-1">
+            Agregar
             <IconCreate />
-        </button>
+        </Link>
 
-        <button className="red flex flex-row items-center justify-center text-white text-lg px-2 py-1 rounded-md mb-2 font-bold hover:text-gray-700 space-x-1">
-          <Link 
-              onClick={()=> { reportTask(true) }}
-          >Reporte PDF</Link>
+        { /* Modal de reportes */
+          open && 
+          <ReportModal title={"Generear reporte de Tareas"} reportTask={reportTask} onCancel={handleClick}/>
+        }
+
+        <Link onClick={() => { handleClick() }} 
+          className="green flex flex-row items-center justify-center text-white text-lg px-2 py-1 rounded-md mb-2 font-bold hover:text-gray-700 space-x-1">
+          Reportes
           <IconReport />
-        </button>
+        </Link>
 
-        <button className="green flex flex-row items-center justify-center text-white text-lg px-2 py-1 rounded-md mb-2 font-bold hover:text-gray-700 space-x-1">
-          <Link 
-              onClick={()=> { reportTask(false) }}
-          >Reporte Excel</Link>
-          <IconReport />
-        </button>
-
-        <span className="font-bold">Total tareas: {tasks.length}</span>
+        <span className="font-bold flex items-center justify-center">Total tareas: {tasks.length}</span>
+        {
+          totalPages > 1 && <span className="font-bold flex items-center justify-center">Pagina: ({currentPage}) de {totalPages}</span>
+        }
       </div>
 
       {
@@ -77,14 +105,20 @@ function TaskPage() {
           ))
       }
 
-      <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-2">
-        {
-          tasks && tasks.map(task => (
+      <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-2">
+        { /* Tarjeta de tareas  */
+          tasksPerPage && tasksPerPage.map(task => (
             <TaskCard task={ task } key={task._id}/>
           ))
         }
       </div>
-    </div> 
+
+      { /* Paginacion  */
+          tasksPerPage.length > 0 && totalPages > 1 && (
+              <Pagination goToPrevPage={goToPrevPage} goToNextPage={goToNextPage} currentPage={currentPage} totalPages={totalPages} />
+          )
+        }
+    </main> 
   )
 }
 

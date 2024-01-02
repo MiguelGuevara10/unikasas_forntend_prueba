@@ -8,3 +8,5 @@ export const loginRequest = user => axios.post('/login', user)
 export const verifyTokenRequest = () => axios.get('/verify')
 
 export const logautRequest = () => axios.get('/logout')
+
+export const recoverAccountRequest = (data) => axios.post('/recover-account', data)

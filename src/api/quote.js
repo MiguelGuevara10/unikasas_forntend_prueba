@@ -13,4 +13,4 @@ export const updateQuoteRequest = (id, quote) => axios.put(`/quotes/${id}`, quot
 
 export const deleteQuoteRequest = (id) => axios.delete(`/quotes/${id}`)
 
-// export const reportTaskRequest = (data) => axios.post('/reports', data, { responseType: 'blob' })
+export const reportQuoteRequest = (data) => axios.post('/reports-quotes', data, { responseType: 'blob' })

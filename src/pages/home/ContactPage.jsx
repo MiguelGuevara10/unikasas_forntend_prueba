@@ -14,7 +14,14 @@ function ContactPage() {
     // Enviar mensaje de contacto
     const onSubmit = handleSubmit(async (data)=> {
         try {
-            const res = await getContactme(data)
+            const dataValid = {
+                ...data,
+                phone: data.phone ? parseInt(data.phone): null,
+            }
+            if (dataValid.phone === null) {
+                delete dataValid.phone
+            }
+            const res = await getContactme(dataValid)
             setSuccesMessage(res.data.message)
             reset() // Limpiar el formulario una vez se guarden los datos
         } catch (error) {
@@ -35,8 +42,8 @@ function ContactPage() {
     }, [errorsMessage, succesMessage])
 
   return (
-    <div className="px-1 py-1 sm:px-6 lg:col-span-3 lg:px-8">
-        <h1 className="text-center text-2xl font-bold mb-4 my-2">Contactanos</h1>
+    <main className="px-1 py-1 sm:px-6 lg:col-span-3 lg:px-8">
+        <h1 className="text-center text-2xl font-bold mb-4 my-2">Contactenos estos son nuestros medios de atención </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-white rounded-md shadow-md p-4 text-center border-2 border-solid hover:border-black hover:shadow-xl">
@@ -70,67 +77,94 @@ function ContactPage() {
             </div>    
         </div>
 
-        <div className="flex justify-center items-center h-screen px-800">
+        <div className="flex justify-center items-center px-800 mt-4 mb-4">
             
-            <form onSubmit={onSubmit} className="bg-white shadow-md rounded-md p-8 max-w-lg w-full border-2 border-solid hover:border-black hover:shadow-xl">
+            <form onSubmit={onSubmit} className="bg-white shadow-md rounded-md p-8 border-2 border-solid hover:border-black hover:shadow-xl">
                 <h2 className="text-2xl font-bold mb-6 text-center">Envianos un mensaje</h2>
-                {
-                    errorsMessage && errorsMessage.map((error, i) => (
-                        <Alert message={error} color={"bg-red-500"} key={i}/>
-                    ))
-                }
-                {
-                    succesMessage && succesMessage.map((success, i) => (
-                        <Alert message={success} color={"bg-green-500"} key={i}/>
-                    ))
-                }
-                <div className="mb-4">
-                    <label htmlFor="name" className="block text-gray-700 font-bold mb-2">Nombre</label>
-                    <input 
-                        type="text" 
-                        {...register('name', { required: true})} 
-                        autoFocus
-                        className="w-full border border-gray-300 rounded-md px-3 py-2" 
-                        placeholder="Nombres y apellidos" 
-                    />
-                </div>
-
-                { errors.name && <Alert message={"El nombre es requerido"} color={"bg-red-500"}/> }
                 
-                <div className="mb-4">
-                    <label htmlFor="email" className="block text-gray-700 font-bold mb-2">Correo Electrónico</label>
-                    <input 
-                        type="email" 
-                        {...register('email', { required: true})} 
-                        className="w-full border border-gray-300 rounded-md px-3 py-2" 
-                        placeholder="Correo Electrónico" 
-                    />
+                <div className='grid grid-cols-1 gap-4 md:md:grid-cols-2 lg:grid-cols-2 mb-2'>
+                    {
+                        errorsMessage && errorsMessage.map((error, i) => (
+                            <Alert message={error} color={"bg-red-500"} key={i}/>
+                        ))
+                    }
+                    {
+                        succesMessage && succesMessage.map((success, i) => (
+                            <Alert message={success} color={"bg-green-500"} key={i}/>
+                        ))
+                    }
+                    <div className="mb-4">
+                        <label htmlFor="name" className="block text-gray-700 font-bold mb-2">Nombre</label>
+                        <input 
+                            id="name"
+                            type="text" 
+                            {...register('name', { required: true})} 
+                            className="w-full border border-gray-300 rounded-md px-3 py-2" 
+                            placeholder="Nombres y apellidos" 
+                        />
+                        { errors.name && <Alert message={"El nombre es requerido"} color={"bg-red-500"}/> }
+                    </div>     
+                    
+                    <div className="mb-4">
+                        <label htmlFor="email" className="block text-gray-700 font-bold mb-2">Correo electrónico</label>
+                        <input 
+                            id="email" 
+                            type="email" 
+                            {...register('email', { required: true})} 
+                            className="w-full border border-gray-300 rounded-md px-3 py-2" 
+                            placeholder="Correo electrónico" 
+                        />
+                        { errors.email && <Alert message={"El email es requerido"} color={"bg-red-500"}/>}
+                    </div>
+
+                    <div className="mb-4">
+                        <label htmlFor="phone" className="block text-gray-700 font-bold mb-2">Telefono</label>
+                        <input
+                            id="phone"
+                            type="text" 
+                            {...register('phone')} 
+                            className="w-full border border-gray-300 rounded-md px-3 py-2" 
+                            placeholder="Numero de telefono"
+                        />
+                    </div>
+
+                    <div className="mb-4">
+                        <label htmlFor="message" className="block text-gray-700 font-bold mb-2">Mensaje</label>
+                        <textarea 
+                            id="message"
+                            rows='3' 
+                            {...register('message', { required: true})} 
+                            className="w-full border border-gray-300 rounded-md px-3 py-2" 
+                            placeholder="Escribenos tu mensaje aquí..">
+                        </textarea>
+                        { errors.message && <Alert message={"El mensaje es requerido"} color={"bg-red-500"}/> }
+                    </div>
+
+                    <div className="mb-4">
+                        <label htmlFor="consent" className="block text-gray-700 font-bold mb-2">Consentimento</label>
+                        <input 
+                            id="consent" 
+                            type="checkbox" 
+                            {...register('consent', { required: true})} 
+                            className="mr-2 border border-gray-300 rounded-md px-3 py-2" 
+                            placeholder="Correo electrónico" 
+                        /><span>Acepto y doy mi consentimiento para el uso y recaudo de mis datos personales.</span> 
+                        { errors.consent && <Alert message={"El consentimiento es requerido"} color={"bg-red-500"}/>}
+                    </div>
+
                 </div>
 
-                { errors.email && <Alert message={"El email es requerido"} color={"bg-red-500"}/>}
-
-                <div className="mb-6">
-                    <label htmlFor="message" className="block text-gray-700 font-bold mb-2">Mensaje</label>
-                    <textarea 
-                        rows='3' 
-                        {...register('message', { required: true})} 
-                        className="w-full border border-gray-300 rounded-md px-3 py-2" 
-                        placeholder="Escribe tu mensaje aquí..">
-                    </textarea>
+                <div className="flex items-center justify-center h-full gap-4">
+                    <button type='submit' className="flex items-center orange text-white font-bold py-2 px-4 rounded-md hover:text-gray-700 space-x-1 mb-1">
+                        Enviar mensaje
+                        <IconSend />
+                    </button>
                 </div>
-
-                { errors.message && <Alert message={"El mensaje es requerido"} color={"bg-red-500"}/> }
-
-                <button 
-                    type="submit" 
-                    className="w-full flex items-center justify-center bg-blue-500 orange text-white font-bold py-2 px-4 rounded-md hover:text-gray-700 space-x-1"
-                    >Enviar
-                    <IconSend />
-                </button>
+                
             </form>
         </div>
         
-    </div>
+    </main>
   )
 }
 

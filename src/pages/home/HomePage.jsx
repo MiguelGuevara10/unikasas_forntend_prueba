@@ -1,64 +1,95 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useProduct } from "../../context/ProductContext"
-import ProductCard from "../../components/ProductCard"
+import ProductCard from "../../components/cards/ProductCard"
 import Alert from "../../components/Alert"
 import { useForm } from "react-hook-form"
-import { IconSearch } from "../../icons/iconsConstants"
+import Pagination from "../../components/Pagination"
+import SearchBar from "../../components/SearchBar"
+import { useQuote } from "../../context/QuoteContext"
 
 function HomePage() {
 
     // Funciones para traer productos registrados al catalogo
-    const { getProductsCatalogue, products, getProductsFilter } = useProduct()
+    const { getProductsCatalogue, products, getProductsFilterCatalogue } = useProduct()
+    const { succes: succesMessage } = useQuote()
     const { register, handleSubmit, reset } = useForm()
 
     useEffect (() => {
       getProductsCatalogue()
     }, [])
 
+    // Paginar productos 
+    const [currentPage, setCurrentPage] = useState(1)
+    const perPage = 9 // Número de usuarios por página
+
+    // Calcular el índice inicial y final para mostrar los productos en la página actual
+    const startIndex = (currentPage - 1) * perPage;
+    const endIndex = currentPage * perPage;
+
+    const totalPages = Math.ceil(products.length / perPage) // Calcular el número total de páginas
+
+    // Obtener los productos para la página actual
+    let productsPerPage = products.slice(startIndex, endIndex)
+
+    // Cambiar a la página anterior
+    const goToPrevPage = () => {
+      setCurrentPage((prevPage) => prevPage - 1);
+    };
+
+    // Cambiar a la página siguiente
+    const goToNextPage = () => {
+      if (currentPage < totalPages) {
+        setCurrentPage((prevPage) => prevPage + 1)
+      }
+    }
+
     // Filtro de busqueda de productos
     const onSubmit = handleSubmit(async (query)=> {
-      getProductsFilter(query)  
-      reset() // Limpiar la barra de busqueda
+      try {
+        await getProductsFilterCatalogue(query)  
+        productsPerPage = products // Cambiar a los usurios filtrados
+        reset() // Limpiar la barra de busqueda
+      } catch (error) {
+        console.error(error)
+      }
     })
 
-  return (
-    <>
-    <section className="">
-      <div className="mx-auto max-w-screen-xl px-2 py-2 sm:px-2 sm:py-2 lg:px-2 lg:py-2">
-        <div className="mx-auto max-w-lg text-center">
-          <h2 className="text-3xl font-bold sm:text-2xl mb-2">Catalogo de productos</h2>
+    // Esta función se ejecutará cuando currentPage cambie para volver al inicio de la pagina
+    useEffect(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [currentPage])
 
-          <form onSubmit={onSubmit}>
-            <div className="flex justify-center">
-              <input 
-                  type="text" 
-                  placeholder="Buscar por nombre, tipo, material, tamaño, precio..." 
-                  {...register('query')}
-                  className="w-full rounded-md px-4 py-2 border border-black-500 shadow-sm focus:outline-none focus:ring-1 focus:ring-black"
-                  />
-              <button 
-                  type="submit" 
-                  className="flex flex-row items-center ml-2 rounded-md text-white px-4 py-2 orange font-bold hover:text-gray-700 space-x-1" 
-                  >Buscar
-                  <IconSearch />
-              </button>
-            </div>
-          </form>
-        </div>
+  return (
+    <main className="px-4 py-4 sm:px-6 lg:col-span-3 lg:px-8">
+        <SearchBar /* Barra de busqueda */
+          module_title={"Nuestro catalogo de productos"} 
+          onSubmit={onSubmit} 
+          register={register} 
+          text={"Buscar producto por nombre, tipo, material o tamaño..."} 
+        />
 
         { products.length === 0 && <Alert message={"No hay productos"} color={"bg-green-500"}/> }
 
-        <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            { 
-              products && products.map(product => (
+        {
+          succesMessage && succesMessage.map((succes, i) => (
+              <Alert message={succes} color={"bg-green-500"} key={i}/>
+            ))
+        }
+
+        <article className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+            { /* Tarjeta de productos */
+              productsPerPage && productsPerPage.map((product) => (
                 <ProductCard product={ product } options={false} key={product._id}/>
-              )) 
+              ))
             }
-        </div>
-        
-      </div>
-    </section>
-    </>
+        </article>
+
+        { /* Paginacion */
+          productsPerPage.length > 0 && totalPages > 1 && (
+            <Pagination goToPrevPage={goToPrevPage} goToNextPage={goToNextPage} currentPage={currentPage} totalPages={totalPages} />
+          )
+        }
+    </main>
   )
 }
 

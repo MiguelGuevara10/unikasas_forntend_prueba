@@ -1,9 +1,11 @@
 import { createContext, useContext, useEffect, useState } from "react"
 import { createTaskRequest, getTasksRequest, deleteTaskRequest, getTaskRequest, updateTaskRequest, reportTaskRequest, getTasksFilterRequest } from "../api/task"
+import reportModules from "../libs/report"
 
 // Crear contexto de tareas
 const TaskContext = createContext()
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useTask = () => {
     const context = useContext(TaskContext)
 
@@ -15,6 +17,7 @@ export const useTask = () => {
 } 
 
 // Creacion de provider de tareas
+// eslint-disable-next-line react/prop-types
 export function TaskProvider({ children }) {
 
     // Definir estados iniciales de productos  
@@ -88,20 +91,19 @@ export function TaskProvider({ children }) {
     }
 
     // Generar reporte pdf o excel
-    const reportTask = async (isPdf) => {
+    const reportTask = async (data) => {
         try {
-            const data = {
-                isPdf
-            }
             const res = await reportTaskRequest(data)
-            // console.log(res)
-            if (res.data.type == 'application/pdf') {
-                const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
-                window.open(url, '_blank'); // Abre el PDF en una nueva ventana
-            } else {
-                const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
-                window.open(url, '_blank'); // Descarga el Ecxel del navegador
+            if (res.data.size === 0) {
+                return false // Devolver que no se encontraron datos para generar el reporte
             }
+            const blob = new Blob([res.data])
+            let fileName = "reporte_tareas"
+            
+            // Funcion de generacion del reporte
+            reportModules(blob, fileName, data.report)
+
+            return true // Delvover que el reporte se genero con exito
         } catch (error) {
             console.error(error)
         }

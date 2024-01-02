@@ -22,6 +22,21 @@ import ProjectFormPage from "./pages/projects/ProjectFormPage"
 import UserPage from "./pages/users/UserPage"
 import { QuoteProvider } from "./context/QuoteContext"
 import ReplyFormPage from "./pages/quotes/ReplyFormPage"
+import UserFormPage from "./pages/users/UserFormPage"
+import { UserProvider } from "./context/UserContext"
+import { ProjectProvider } from "./context/ProjectContext"
+import ProjectStages from "./pages/projects/stages/ProjectStages"
+import ProjectStageFormPage from "./pages/projects/stages/ProjectStageFormPage"
+import { StageProvider } from "./context/StageContext"
+import ProjectStageActivities from "./pages/projects/activitities/ProjectStageActivities"
+import StageActivitiesFormPage from "./pages/projects/activitities/StageActivitiesFormPage"
+import ContactsPeople from "./pages/contacts/ContactsPeople"
+import { ActivityProvider } from "./context/ActivityContext"
+import { ContactProvider } from "./context/ContactPeople"
+import RecoverAccount from "./pages/home/RecoverAccount"
+import { RoleProvider } from "./context/RolContex"
+import RolePage from "./pages/users/roles/RolePage"
+import RoleFormPage from "./pages/users/roles/RoleFormPage"
 
 function App() {
   return (
@@ -29,6 +44,12 @@ function App() {
       <TaskProvider> {/* Provider de tareas para pasar metodos y variables a los demas componentes*/}
       <ProductProvider> {/* Provider de productos para pasar metodos y variables a los demas componentes*/}
       <QuoteProvider> {/* Provider de cotizaciones para pasar metodos y variables a los demas componentes*/}
+      <UserProvider> {/* Provider de usuarios para pasar metodos y variables a los demas componentes*/}
+      <ProjectProvider> {/* Provider de proyectos para pasar metodos y variables a los demas componentes*/}  
+      <StageProvider> {/* Provider de etapas para pasar metodos y variables a los demas componentes*/} 
+      <ActivityProvider> {/* Provider de actividades para pasar metodos y variables a los demas componentes*/}  
+      <ContactProvider> {/* Provider de contactos de personas para pasar metodos y variables a los demas componentes*/} 
+      <RoleProvider> {/* Provider de roles para pasar metodos y variables a los demas componentes*/} 
         <BrowserRouter>
           <Navbar/> {/* Navbar para que sea visible en todas la paginas*/}
           <Routes>
@@ -38,6 +59,8 @@ function App() {
               <Route path="/register" element={<RegisterPage/>}></Route>
               <Route path="/us" element={<UsPage/>}></Route>
               <Route path="/contact" element={<ContactPage />}></Route>
+              { /* Recuperar cuenta */}
+              <Route path="/recover-account" element={<RecoverAccount />}></Route> 
 
               {/* Ruta de cotizacion no protegida para que los clientes puedan cotizar */}
               <Route path="/add-quote" element={<QuoteFormPage />}></Route>
@@ -63,20 +86,43 @@ function App() {
                 <Route path="/projects" element={<ProjectPage />}></Route>
                 <Route path="/add-project" element={<ProjectFormPage />}></Route>
                 <Route path="/add-project/:id" element={<ProjectFormPage />}></Route>
+                <Route path="/project-stages/:id" element={<ProjectStages />}></Route>
+                {/* Etapas del proyecto*/}
+                <Route path="/add-stage" element={<ProjectStageFormPage />}></Route>
+                <Route path="/add-stage/:id" element={<ProjectStageFormPage />}></Route> 
+                <Route path="/add-stage/project/:projectId" element={<ProjectStageFormPage />}></Route> 
+                {/* Acividades de una etapa del proyecto*/}
+                <Route path="/project-stage-activities/:id/:projectId" element={<ProjectStageActivities />}></Route>
+                <Route path="/add-activities/:id" element={<StageActivitiesFormPage />}></Route>
+                <Route path="/add-activities/stage/:stageId" element={<StageActivitiesFormPage />}></Route>
 
                 {/* Rutas de usuarios */}
                 <Route path="/profile" element={<ProfilePage />}></Route>
                 <Route path="/users" element={<UserPage />}></Route>
+                <Route path="/add-user" element={<UserFormPage />}></Route>
+                <Route path="/add-user/:id" element={<UserFormPage />}></Route>
+                {/* Roles de ususrio */}
+                <Route path="/roles" element={<RolePage />}></Route>
+                <Route path="/add-role" element={<RoleFormPage />}></Route>
+                <Route path="/add-role/:id" element={<RoleFormPage />}></Route>
+
+                {/* Rutas de contactos de personas */}
+                <Route path="/contacts-people" element={<ContactsPeople />}></Route>
 
               </Route>
           </Routes>
           <Footer/>
         </BrowserRouter>
+        </RoleProvider>  
+        </ContactProvider> 
+        </ActivityProvider>
+        </StageProvider>  
+        </ProjectProvider>
+        </UserProvider>
         </QuoteProvider>
         </ProductProvider>
       </TaskProvider>
     </AuthProvider>
-    
   )
 }
 

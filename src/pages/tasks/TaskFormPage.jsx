@@ -3,7 +3,7 @@ import { useTask } from '../../context/TaskContext'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import Alert from '../../components/Alert'
-import { IconClose, IconSave } from '../../icons/iconsConstants'
+import { IconBack, IconClose, IconSave } from '../../icons/iconsConstants'
 
 // Importar libreria para casteao de fechas
 import dayjs from 'dayjs'
@@ -59,9 +59,12 @@ function TashFormPage() {
   })
 
   return (
-    <div className="flex justify-center items-center px-800 m-2">
+    <main className="flex justify-center items-center px-800 m-2">
             <form onSubmit={onSubmit} className="bg-white shadow-md rounded-md p-8 max-w-lg w-full border-2 border-solid hover:border-black hover:shadow-xl">
-                <h2 className="text-2xl font-bold mb-4 text-center">Agregar o editar tareas</h2>
+                <Link to={"/tasks"}>
+                    <IconBack />
+                </Link>
+                <h2 className="text-2xl font-bold mb-4 text-center">{ params.id ? "Editar tarea" : "Agregar tarea"}</h2>
                 {
                     errorsMessage && errorsMessage.map((error, i) => (
                         <Alert message={error} color={"bg-red-500"} key={i}/>
@@ -70,6 +73,7 @@ function TashFormPage() {
                 <div className="mb-2">
                     <label htmlFor="title" className="block text-gray-700 font-bold mb-2">Titulo</label>
                     <input 
+                        id='title'
                         type="text" 
                         {...register('title', { required: true})} 
                         autoFocus
@@ -83,6 +87,7 @@ function TashFormPage() {
                 <div className="mb-2">
                     <label htmlFor="description" className="block text-gray-700 font-bold mb-2">Descripción</label>
                     <textarea 
+                        id='description'
                         rows="3" 
                         {...register('description', { required: true})} 
                         className="w-full border border-gray-300 rounded-md px-3 py-2" 
@@ -95,6 +100,7 @@ function TashFormPage() {
                 <div className="mb-2">
                     <label htmlFor="date" className="block text-gray-700 font-bold mb-2">Fecha</label>
                     <input 
+                        id='date'
                         type="date" 
                         {...register('date')} 
                         className="w-full border border-gray-300 rounded-md px-3 py-2" 
@@ -110,15 +116,16 @@ function TashFormPage() {
                         <IconSave />
                     </button>
 
-                    <button
+                    <Link 
+                        to={"/tasks"}
                         className="flex items-center red text-white font-bold py-2 px-4 rounded-md hover:text-gray-700 space-x-1 mb-1">
-                        <Link to={"/tasks"}>Cancelar</Link>                            
+                        Cancelar                           
                         <IconClose />
-                    </button> 
+                    </Link> 
             </div>
 
             </form>
-        </div>
+        </main>
   )
 }
 

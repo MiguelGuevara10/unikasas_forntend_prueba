@@ -1,9 +1,11 @@
 import { createContext, useContext, useEffect, useState } from "react"
-import { createQuoteRequest, deleteQuoteRequest, getQuoteFilterRequest, getQuoteRequest, getQuotesRequest, updateQuoteRequest } from "../api/quote"
+import { createQuoteRequest, deleteQuoteRequest, getQuoteFilterRequest, getQuoteRequest, getQuotesRequest, reportQuoteRequest, updateQuoteRequest } from "../api/quote"
+import reportModules from "../libs/report"
 
 // Crear contexto de cotizaciones
 const QuoteContext = createContext()
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useQuote = () => {
     const context = useContext(QuoteContext)
 
@@ -15,6 +17,7 @@ export const useQuote = () => {
 } 
 
 // Creacion de provider de cotizaciones
+// eslint-disable-next-line react/prop-types
 export function QuoteProvider({ children }) {
 
     // Definir estados iniciales de Cotizaciones
@@ -87,6 +90,25 @@ export function QuoteProvider({ children }) {
         }
     }
 
+    // Generar reporte pdf o excel
+    const reportQuote = async (data) => {
+        try {
+            const res = await reportQuoteRequest(data)
+            if (res.data.size === 0) {
+                return false // Devolver que no se encontraron datos para generar el reporte
+            }
+            const blob = new Blob([res.data])
+            let fileName = "reporte_cotizaciones"
+
+            // Funcion de generacion del reporte
+            reportModules(blob, fileName, data.report)
+
+            return true // Delvover que el reporte se genero con exito
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
     // Eliminacion de errores a diligenciar datos no validos en el formulario
     useEffect(() => {
         if (errors.length > 0 || succes.length > 0) {
@@ -107,9 +129,11 @@ export function QuoteProvider({ children }) {
         createQuote,
         updateQuote,
         deleteQuote,
+        reportQuote,
         errors,
         succes,
         setSucces,
+        setErrors,
     }}>
         {children }
     </QuoteContext.Provider>

@@ -1,5 +1,13 @@
-import { IconClose, IconSend } from "../icons/iconsConstants"
+import { IconClose, IconSend } from "../../icons/iconsConstants"
 
+/**
+ * Componente modal de eliminacion del registros,
+ * recibe los siguientes parametros:
+ * @param {Function} onConfirm - Funcion de eliminacion del elemento 
+ * @param {string} id - Corresponde al id del elemento a eliminar
+ * @param {Function} onCancel - Funcion de cancelacion de eliminacion del elemento 
+ */
+// eslint-disable-next-line react/prop-types
 function Modal({ onConfirm, id, onCancel }) {
   return (
     <>
@@ -11,7 +19,7 @@ function Modal({ onConfirm, id, onCancel }) {
             <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
             <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
               <div className="bg-white px-4 pt-5 pb-4">
-                <div className="sm:flex sm:items-start">
+                <div className="sm:flex justify-center sm:items-start">
                   <div className="mt-3 sm:mt-0 sm:ml-4 sm:text-left">
                     <h3 className="text-lg leading-6 font-bold text-center">Confirmación de eliminación</h3>
                     <div className="mt-2">
@@ -40,7 +48,6 @@ function Modal({ onConfirm, id, onCancel }) {
             </div>
           </div>
         </div>
-    
     </>
   )
 }

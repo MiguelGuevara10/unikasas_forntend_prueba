@@ -1,10 +1,11 @@
 import { createContext, useState, useContext, useEffect } from "react"
-import { registerRequest, loginRequest, verifyTokenRequest } from "../api/auth"
+import { registerRequest, loginRequest, verifyTokenRequest, recoverAccountRequest } from "../api/auth"
 import Cookies from 'js-cookie'
 
 // Creacion del contexto de usuario
 export const AuthContex = createContext()
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
     const context = useContext(AuthContex)
     if (!context){
@@ -14,12 +15,14 @@ export const useAuth = () => {
 }
 
 // Creacion de provider de autenticación de usuarios
+// eslint-disable-next-line react/prop-types
 export const AuthProvider = ({ children }) => {
 
     // Definicion de variables de usuario
     const [user, setUser] = useState(null)
     const [isAuthenticated, setIsAuthenticated] = useState(false)
     const [errors, setErrors] = useState([])
+    const [succes, setSucces] = useState([])
     const [loading, setLoading] = useState(true) // Validacion de carga de informacion
 
     // Regisro de usuario
@@ -32,7 +35,7 @@ export const AuthProvider = ({ children }) => {
             console.error(error.response.data)
             setErrors(error.response.data)
         }
-    }
+    } 
 
     // Login de unuario
     const signin = async (user) => {
@@ -60,15 +63,27 @@ export const AuthProvider = ({ children }) => {
         }
     }
 
+    // Recuperar acceso a la cuneta
+    const recoverAccount = async (data) => {
+        try {
+            const res = await recoverAccountRequest(data)
+            return res  
+        } catch (error) {
+            console.error(error.response.data)
+            setErrors(error.response.data)
+        }
+    } 
+
     // Eliminacion de errores a diligenciar datos no validos en el formulario
     useEffect(() => {
-        if (errors.length > 0) {
+        if (errors.length > 0 || succes.length > 0) {
             const timer = setTimeout(() => {
-                setErrors([]);  
+                setErrors([])
+                setSucces([])  
             }, 5000);
             return () => clearTimeout(timer);
         }
-    }, [errors])
+    }, [errors, succes])
 
     // Validacion de login de usuario
     useEffect(() => {
@@ -111,7 +126,11 @@ export const AuthProvider = ({ children }) => {
             user,
             isAuthenticated, 
             errors,
+            succes,
+            setSucces,
+            setErrors,
             loading,
+            recoverAccount,
         }}>
             {children}
         </AuthContex.Provider>

@@ -1,9 +1,11 @@
 import { createContext, useContext, useEffect, useState } from "react"
-import { createProductRequest, deleteProductRequest, getProductRequest, getProductsFilterRequest, getProductsRequest, getProductsRequestCatalogue, updateProductRequest } from "../api/product"
+import { createProductRequest, deleteProductRequest, getProductRequest, getProductsFilterCatalogueRequest, getProductsFilterRequest, getProductsRequest, getProductsRequestCatalogue, reportProductRequest, updateProductRequest } from "../api/product"
+import reportModules from "../libs/report"
 
 // Crear contexto de productos
 const ProductContext = createContext()
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useProduct = () => {
     const context = useContext(ProductContext)
 
@@ -15,6 +17,7 @@ export const useProduct = () => {
 } 
 
 // Creacion de provider de productos
+// eslint-disable-next-line react/prop-types
 export function ProductProvider({ children }) {
 
     // Definir estados iniciales de productos  
@@ -47,6 +50,17 @@ export function ProductProvider({ children }) {
     const getProductsCatalogue = async () => {
         try {
             const res = await getProductsRequestCatalogue()
+            setProducts(res.data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    // Traer productos con filtro de busqueda en en catalogo
+    const getProductsFilterCatalogue = async (query) => {
+        try {
+            const res = await  getProductsFilterCatalogueRequest(query.query)
+            // console.log(res)
             setProducts(res.data)
         } catch (error) {
             console.log(error)
@@ -99,21 +113,18 @@ export function ProductProvider({ children }) {
     }
 
     // Generar reporte pdf o excel
-    const reportProduct = async (isPdf) => {
+    const reportProduct = async (data) => {
         try {
-            const data = {
-                isPdf
+            const res = await reportProductRequest(data)
+            if (res.data.size === 0) {
+                return false // Devolver que no se encontraron datos para generar el reporte
             }
-            console.log(data)
-            // const res = await reportTaskRequest(data)
-            // // console.log(res)
-            // if (res.data.type == 'application/pdf') {
-            //     const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
-            //     window.open(url, '_blank'); // Abre el PDF en una nueva ventana
-            // } else {
-            //     const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
-            //     window.open(url, '_blank'); // Descarga el Ecxel del navegador
-            // }
+            const blob = new Blob([res.data])
+            let fileName = "reporte_productos"
+
+            // Funcion de generacion del reporte
+            reportModules(blob, fileName, data.report)
+            return true // Delvover que el reporte se genero con exito
         } catch (error) {
             console.error(error)
         }
@@ -142,6 +153,7 @@ export function ProductProvider({ children }) {
             updateProduct,
             deleteProdct,
             getProductsFilter,
+            getProductsFilterCatalogue,
             reportProduct,
             errors,
             succes,

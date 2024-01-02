@@ -2,7 +2,7 @@ import { IconInformation, IconMision, IconVission } from "../../icons/iconsConst
 
 function UsPage() {
   return (
-    <div className="px-1 py-1 sm:px-6 lg:col-span-3 lg:px-8 mb-4">
+    <main className="px-1 py-1 sm:px-6 lg:col-span-3 lg:px-8 mb-4">
         <h1 className="text-center text-2xl font-bold mb-4 my-2">Nosotros</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -33,7 +33,7 @@ function UsPage() {
                 </p>
             </div>
         </div>
-    </div>
+    </main>
   )
 }
 

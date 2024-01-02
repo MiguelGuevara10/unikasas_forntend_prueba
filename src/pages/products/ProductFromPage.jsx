@@ -3,7 +3,7 @@ import { useProduct } from '../../context/ProductContext'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import Alert from '../../components/Alert'
-import { IconClose, IconSave } from '../../icons/iconsConstants'
+import { IconBack, IconClose, IconSave } from '../../icons/iconsConstants'
 
 function ProductFromPage() {
 
@@ -71,9 +71,13 @@ function ProductFromPage() {
     })
 
   return (
-    <div className="mt-4 mb-4 flex items-center justify-center min-h-screen">
-        <div className="bg-white shadow-md rounded-md p-8 max-w-screen-lg w-full border-2 border-solid hover:border-black hover:shadow-xl">
-            <h2 className="text-2xl font-bold mb-6 text-center">Agregar o editar producto</h2>
+    <div className="m-4 flex items-center justify-center">
+        <div className="bg-white shadow-md rounded-md p-8 w-full border-2 border-solid hover:border-black hover:shadow-xl">
+        
+            <button onClick={ () => navigate("/products")} >
+                <IconBack />
+            </button>
+            <h2 className="text-2xl font-bold mb-6 text-center">{ params.id ? "Editar producto" : "Agregar producto"}</h2>
                 {
                     errorsMessage && errorsMessage.map((error, i) => (
                         <Alert message={error} color={"bg-red-500"} key={i}/>
@@ -81,10 +85,11 @@ function ProductFromPage() {
                 }
 
                 <form onSubmit={onSubmit}>
-                    <div className='grid grid-cols-1 gap-4 md:grid-cols-2 mb-2'>
+                    <div className='grid grid-cols-1 gap-4 md:md:grid-cols-2 lg:grid-cols-3 mb-2'>
                         <div className="mb-1">
                             <label htmlFor="name" className="block text-gray-700 font-bold mb-2">Nombre</label>
                             <input 
+                                id='name'
                                 type='text'
                                 placeholder="Nombre de producto" 
                                 {...register('name', { required: true})}
@@ -97,6 +102,7 @@ function ProductFromPage() {
                         <div className="mb-1">
                             <label htmlFor="image" className="block text-gray-700 font-bold mb-2">Url imagen</label>
                             <input 
+                                id='image'
                                 type='text'
                                 placeholder="Url de la imagen" 
                                 {...register('image', { required: true})}
@@ -107,9 +113,10 @@ function ProductFromPage() {
 
                         <div className="mb-1">
                             <label htmlFor="description" className="block text-gray-700 font-bold mb-2">Descripcion</label>
-                            <input 
-                                type='text'
-                                placeholder="Descripción" 
+                            <textarea
+                                id='description'
+                                rows="3"
+                                placeholder="Escriba aqui la descripción del producto..." 
                                 {...register('description', { required: true})}
                                 className="w-full border border-gray-300 rounded-md px-3 py-2" 
                             />
@@ -119,6 +126,7 @@ function ProductFromPage() {
                         <div className="mb-1">
                             <label htmlFor="price" className="block text-gray-700 font-bold mb-2">Precio</label>
                             <input 
+                                id='price'
                                 type='number'
                                 placeholder="Precio del producto" 
                                 {...register('price', { required: true})}
@@ -130,6 +138,7 @@ function ProductFromPage() {
                         <div className="mb-1">
                             <label htmlFor="type" className="block text-gray-700 font-bold mb-2">Tipo</label>
                             <input 
+                                id='type' 
                                 type='text'
                                 placeholder="Tipo del producto" 
                                 {...register('type', { required: true})}
@@ -141,6 +150,7 @@ function ProductFromPage() {
                         <div className="mb-1">
                             <label htmlFor="material" className="block text-gray-700 font-bold mb-2">Material</label>
                             <input 
+                                id='material'
                                 type='text'
                                 placeholder="Material del producto" 
                                 {...register('material', { required: true})}
@@ -152,6 +162,7 @@ function ProductFromPage() {
                         <div className="mb-1">
                             <label htmlFor="floors" className="block text-gray-700 font-bold mb-2">Pisos</label>
                             <input 
+                                id='floors'
                                 type='Number'
                                 placeholder="Pisos" 
                                 {...register('floors', { required: true})}
@@ -163,6 +174,7 @@ function ProductFromPage() {
                         <div className="mb-1">
                             <label htmlFor="size" className="block text-gray-700 font-bold mb-2">Tamaño</label>
                             <input 
+                                id='size'
                                 type='text'
                                 placeholder="Tamaño" 
                                 {...register('size', { required: true})}
@@ -174,6 +186,7 @@ function ProductFromPage() {
                         <div className="mb-1">
                             <label htmlFor="bedrooms" className="block text-gray-700 font-bold mb-2">Habitaciones</label>
                             <input 
+                                id='bedrooms'
                                 type='text'
                                 placeholder="Habitaciones" 
                                 {...register('bedrooms', { required: true})}
@@ -190,7 +203,7 @@ function ProductFromPage() {
                                 {...register('state', { required: true})}
                                 className="w-full border border-gray-300 rounded-md px-3 py-2"
                                 >
-                                {/* <option value="" disabled selected>Seleccione estado</option> */}
+                                <option defaultValue={"Seleccione un estado"} disabled>Seleccione un estado</option>
                                 <option value={true}>Activo</option>
                                 <option value={false}>Inactivo</option>
                             </select>
@@ -203,10 +216,11 @@ function ProductFromPage() {
                             Guardar
                             <IconSave />
                         </button>
-                        <button className="flex items-center red text-white font-bold py-2 px-4 rounded-md hover:text-gray-700 space-x-1 mb-1">
-                            <Link to={"/products"}>Cancelar</Link>
+
+                        <Link to={"/products"} className="flex items-center red text-white font-bold py-2 px-4 rounded-md hover:text-gray-700 space-x-1 mb-1">
+                            Cancelar
                             <IconClose />
-                        </button>
+                        </Link>
                     </div>
                 </form>
         </div>
